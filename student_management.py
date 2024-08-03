@@ -1,6 +1,7 @@
 from tkinter import ttk, Tk, Frame, StringVar, Toplevel, END, Button
 import sqlite3
 from tkcalendar import DateEntry
+from config import get_classroom_titles
 
 class StudentManagement:
     def __init__(self, frame):
@@ -50,7 +51,7 @@ class StudentManagement:
         self.date_of_register.grid(row=4, column=1, padx=5, pady=5)
 
         ttk.Label(self.registration_frame, text='Classroom: ').grid(row=5, column=0, padx=5, pady=5, sticky='w')
-        self.classroom = ttk.Combobox(self.registration_frame, values=["1As", "2As", "3As", "4As", "5C", "5D", "6C", "6D", "7C", "7D", "5O", "5A", "6O", "6A", "7O", "7A"], width=27)
+        self.classroom = ttk.Combobox(self.registration_frame, values=get_classroom_titles(), width=27)
         self.classroom.grid(row=5, column=1, padx=5, pady=5)
 
         ttk.Label(self.registration_frame, text='Price: ').grid(row=6, column=0, padx=5, pady=5, sticky='w')
@@ -203,6 +204,16 @@ class StudentManagement:
 
         self.edit_window = Toplevel()
         self.edit_window.title('Edit Student')
+        self.edit_window.resizable(False, False)
+
+        # Center the window on the screen
+        window_width = 310
+        window_height = 260
+        screen_width = self.edit_window.winfo_screenwidth()
+        screen_height = self.edit_window.winfo_screenheight()
+        position_top = int(screen_height / 2 - window_height / 2)
+        position_right = int(screen_width / 2 - window_width / 2)
+        self.edit_window.geometry(f'{window_width}x{window_height}+{position_right}+{position_top}')
 
         ttk.Label(self.edit_window, text='Name: ').grid(row=1, column=0, padx=5, pady=5, sticky='w')
         new_name = ttk.Entry(self.edit_window, width=30)
@@ -225,7 +236,7 @@ class StudentManagement:
         new_date_of_register.set_date(date_of_register)
 
         ttk.Label(self.edit_window, text='Classroom: ').grid(row=5, column=0, padx=5, pady=5, sticky='w')
-        new_classroom = ttk.Combobox(self.edit_window, values=["1As", "2As", "3As", "4As", "5C", "5D", "6C", "6D", "7C", "7D", "5O", "5A", "6O", "6A", "7O", "7A"], width=27)
+        new_classroom = ttk.Combobox(self.edit_window, values=get_classroom_titles(), width=27)
         new_classroom.grid(row=5, column=1, padx=5, pady=5)
         new_classroom.set(classroom)
 
@@ -239,7 +250,16 @@ class StudentManagement:
         new_number_of_agent.grid(row=7, column=1, padx=5, pady=5)
         new_number_of_agent.insert(0, number_of_agent)
 
-        Button(self.edit_window, text='Update', command=lambda: self.update_student(new_name.get(), new_code_rim.get(), new_gender.get(), new_date_of_register.get(), new_classroom.get(), new_price.get(), new_number_of_agent.get(), student_id)).grid(row=8, columnspan=2, pady=10, sticky='we')
+        # Custom style for the Update button
+        style = ttk.Style()
+        style.configure('Custom.TButton')
+
+        def update_and_close():
+            self.update_student(new_name.get(), new_code_rim.get(), new_gender.get(), new_date_of_register.get(), new_classroom.get(), new_price.get(), new_number_of_agent.get(), student_id)
+            self.edit_window.destroy()
+
+        ttk.Button(self.edit_window, text='Update', command=update_and_close, style='Custom.TButton').grid(row=8, columnspan=2, pady=10, sticky='we')
+
 
     def update_student(self, name, code_rim, gender, date_of_register, classroom, price, number_of_agent, student_id):
         query = 'UPDATE students SET name = ?, code_rim = ?, gender = ?, date_of_register = ?, classroom = ?, price = ?, number_of_agent = ? WHERE id = ?'
@@ -283,7 +303,8 @@ class StudentManagement:
         self.name.delete(0, END)
         self.code_rim.delete(0, END)
         self.gender.set('')
-        self.date_of_register.set_date('')
+        self.date_of_register.set_date(None)  # Use None to clear the DateEntry widget
+        self.classroom.set('')
         self.classroom.set('')
         self.price.delete(0, END)
         self.number_of_agent.delete(0, END)
