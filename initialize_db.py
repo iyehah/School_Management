@@ -9,6 +9,7 @@ cursor = conn.cursor()
 
 # Drop existing tables if they exist
 cursor.execute("DROP TABLE IF EXISTS students;")
+cursor.execute("DROP TABLE IF EXISTS classrooms;")
 
 # Create new tables with additional fields
 create_students_table = '''
@@ -24,8 +25,19 @@ CREATE TABLE IF NOT EXISTS students (
 );
 '''
 
-# Execute the query to create the table
+create_classrooms_table = '''
+CREATE TABLE IF NOT EXISTS classrooms (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    level TEXT NOT NULL,
+    type TEXT NOT NULL,
+    subjects TEXT
+);
+'''
+
+# Execute the queries to create the tables
 cursor.execute(create_students_table)
+cursor.execute(create_classrooms_table)
 
 # Commit the changes and close the connection
 conn.commit()

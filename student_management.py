@@ -1,5 +1,6 @@
-from tkinter import ttk, Tk, Frame, StringVar, Toplevel, END
+from tkinter import ttk, Tk, Frame, StringVar, Toplevel, END, Button
 import sqlite3
+from tkcalendar import DateEntry
 
 class StudentManagement:
     def __init__(self, frame):
@@ -41,15 +42,15 @@ class StudentManagement:
         self.code_rim.grid(row=2, column=1, padx=5, pady=5)
 
         ttk.Label(self.registration_frame, text='Gender: ').grid(row=3, column=0, padx=5, pady=5, sticky='w')
-        self.gender = ttk.Combobox(self.registration_frame, values=['Male', 'Female'], width=27)
+        self.gender = ttk.Combobox(self.registration_frame, values=["Male", "Female"], width=27)
         self.gender.grid(row=3, column=1, padx=5, pady=5)
 
         ttk.Label(self.registration_frame, text='Date of Register: ').grid(row=4, column=0, padx=5, pady=5, sticky='w')
-        self.date_of_register = ttk.Entry(self.registration_frame, width=30)
+        self.date_of_register = DateEntry(self.registration_frame, width=27)
         self.date_of_register.grid(row=4, column=1, padx=5, pady=5)
 
         ttk.Label(self.registration_frame, text='Classroom: ').grid(row=5, column=0, padx=5, pady=5, sticky='w')
-        self.classroom = ttk.Combobox(self.registration_frame, values=['1As', '2As', '3As', '4As', '5C', '5D', '6C', '6D', '7C', '7D', '5O', '5A', '6O', '6A', '7O', '7A'], width=27)
+        self.classroom = ttk.Combobox(self.registration_frame, values=["1As", "2As", "3As", "4As", "5C", "5D", "6C", "6D", "7C", "7D", "5O", "5A", "6O", "6A", "7O", "7A"], width=27)
         self.classroom.grid(row=5, column=1, padx=5, pady=5)
 
         ttk.Label(self.registration_frame, text='Price: ').grid(row=6, column=0, padx=5, pady=5, sticky='w')
@@ -71,6 +72,17 @@ class StudentManagement:
         self.search_entry = ttk.Entry(self.search_frame, width=30)
         self.search_entry.pack(side='left', padx=5)
         ttk.Button(self.search_frame, text='Search', command=self.search_student).pack(side='left', padx=5)
+
+        ttk.Label(self.search_frame, text='Filter by Date : ').pack(side='left', padx=5)
+        self.filter_date = DateEntry(self.search_frame, width=12)
+        self.filter_date.pack(side='left', padx=5)
+        ttk.Button(self.search_frame, text='Filter by Date', command=self.filter_by_date).pack(side='left', padx=5)
+        
+        ttk.Label(self.search_frame, text='Filter by Class: ').pack(side='left', padx=5)
+        self.filter_classroom = ttk.Combobox(self.search_frame, values=["", "1As", "2As", "3As", "4As", "5C", "5D", "6C", "6D", "7C", "7D", "5O", "5A", "6O", "6A", "7O", "7A"], width=15)
+        self.filter_classroom.pack(side='left', padx=5)
+        self.filter_classroom.set("")
+        ttk.Button(self.search_frame, text='Filter by Classroom', command=self.filter_by_classroom).pack(side='left', padx=5)
 
         self.tree = ttk.Treeview(self.second_block, height=15, columns=('id', 'name', 'code_rim', 'gender', 'date_of_register', 'classroom', 'price', 'number_of_agent'), show='headings')
         self.tree.pack(side='top', fill='both', expand=True)
@@ -124,33 +136,53 @@ class StudentManagement:
     def search_student(self):
         search_query = self.search_entry.get()
         query = 'SELECT * FROM students WHERE code_rim LIKE ?'
-        parameters = (f'%{search_query}%',)
-        db_rows = self.run_query(query, parameters)
+        parameters = [f'%{search_query}%']
+        db_rows = self.run_query(query, tuple(parameters))
+        self.tree.delete(*self.tree.get_children())
+        for row in db_rows:
+            self.tree.insert('', 'end', values=row)
+
+    def filter_by_date(self):
+        date_filter = self.filter_date.get()
+        query = 'SELECT * FROM students WHERE date_of_register = ?'
+        parameters = [date_filter]
+        db_rows = self.run_query(query, tuple(parameters))
+        self.tree.delete(*self.tree.get_children())
+        for row in db_rows:
+            self.tree.insert('', 'end', values=row)
+
+    def filter_by_classroom(self):
+        classroom_filter = self.filter_classroom.get()
+        query = 'SELECT * FROM students WHERE classroom = ?'
+        parameters = [classroom_filter]
+        db_rows = self.run_query(query, tuple(parameters))
         self.tree.delete(*self.tree.get_children())
         for row in db_rows:
             self.tree.insert('', 'end', values=row)
 
     def add_student(self):
         if self.validate():
-            query = 'INSERT INTO students VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)'
+            query = 'INSERT INTO students VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)'
             parameters = (self.name.get(), self.code_rim.get(), self.gender.get(), self.date_of_register.get(), self.classroom.get(), self.price.get(), self.number_of_agent.get())
             self.run_query(query, parameters)
             self.message['text'] = f'Student {self.name.get()} added successfully'
+            self.get_students()
             self.clear_fields()
         else:
             self.message['text'] = 'All fields are required'
-        self.get_students()
 
     def delete_student(self):
         self.message['text'] = ''
         try:
-            student_id = self.tree.item(self.tree.selection())['values'][0]
+            self.tree.item(self.tree.selection())['values'][0]
         except IndexError:
             self.message['text'] = 'Please, select a record'
             return
+        self.message['text'] = ''
+        student_id = self.tree.item(self.tree.selection())['values'][0]
         query = 'DELETE FROM students WHERE id = ?'
         self.run_query(query, (student_id,))
-        self.message['text'] = f'Record {student_id} deleted successfully'
+        self.message['text'] = f'Student {student_id} deleted successfully'
         self.get_students()
 
     def edit_student(self):
@@ -169,117 +201,94 @@ class StudentManagement:
             self.message['text'] = 'Please, select a record'
             return
 
-        self.edit_wind = Toplevel()
-        self.edit_wind.title(f'Edit Student {student_id}')
-        
-        # Creating and positioning input fields and save button
-        ttk.Label(self.edit_wind, text='Name: ').grid(row=0, column=0, padx=5, pady=5, sticky='w')
-        self.edit_name = ttk.Entry(self.edit_wind, width=30)
-        self.edit_name.grid(row=0, column=1, padx=5, pady=5)
-        self.edit_name.insert(0, name)
+        self.edit_window = Toplevel()
+        self.edit_window.title('Edit Student')
 
-        ttk.Label(self.edit_wind, text='Code Rim: ').grid(row=1, column=0, padx=5, pady=5, sticky='w')
-        self.edit_code_rim = ttk.Entry(self.edit_wind, width=30)
-        self.edit_code_rim.grid(row=1, column=1, padx=5, pady=5)
-        self.edit_code_rim.insert(0, code_rim)
+        ttk.Label(self.edit_window, text='Name: ').grid(row=1, column=0, padx=5, pady=5, sticky='w')
+        new_name = ttk.Entry(self.edit_window, width=30)
+        new_name.grid(row=1, column=1, padx=5, pady=5)
+        new_name.insert(0, name)
 
-        ttk.Label(self.edit_wind, text='Gender: ').grid(row=2, column=0, padx=5, pady=5, sticky='w')
-        self.edit_gender = ttk.Combobox(self.edit_wind, values=['Male', 'Female'], width=27)
-        self.edit_gender.grid(row=2, column=1, padx=5, pady=5)
-        self.edit_gender.set(gender)
+        ttk.Label(self.edit_window, text='Code Rim: ').grid(row=2, column=0, padx=5, pady=5, sticky='w')
+        new_code_rim = ttk.Entry(self.edit_window, width=30)
+        new_code_rim.grid(row=2, column=1, padx=5, pady=5)
+        new_code_rim.insert(0, code_rim)
 
-        ttk.Label(self.edit_wind, text='Date of Register: ').grid(row=3, column=0, padx=5, pady=5, sticky='w')
-        self.edit_date_of_register = ttk.Entry(self.edit_wind, width=30)
-        self.edit_date_of_register.grid(row=3, column=1, padx=5, pady=5)
-        self.edit_date_of_register.insert(0, date_of_register)
+        ttk.Label(self.edit_window, text='Gender: ').grid(row=3, column=0, padx=5, pady=5, sticky='w')
+        new_gender = ttk.Combobox(self.edit_window, values=["Male", "Female"], width=27)
+        new_gender.grid(row=3, column=1, padx=5, pady=5)
+        new_gender.set(gender)
 
-        ttk.Label(self.edit_wind, text='Classroom: ').grid(row=4, column=0, padx=5, pady=5, sticky='w')
-        self.edit_classroom = ttk.Combobox(self.edit_wind, values=['1As', '2As', '3As', '4As', '5C', '5D', '6C', '6D', '7C', '7D', '5O', '5A', '6O', '6A', '7O', '7A'], width=27)
-        self.edit_classroom.grid(row=4, column=1, padx=5, pady=5)
-        self.edit_classroom.set(classroom)
+        ttk.Label(self.edit_window, text='Date of Register: ').grid(row=4, column=0, padx=5, pady=5, sticky='w')
+        new_date_of_register = DateEntry(self.edit_window, width=27)
+        new_date_of_register.grid(row=4, column=1, padx=5, pady=5)
+        new_date_of_register.set_date(date_of_register)
 
-        ttk.Label(self.edit_wind, text='Price: ').grid(row=5, column=0, padx=5, pady=5, sticky='w')
-        self.edit_price = ttk.Entry(self.edit_wind, width=30)
-        self.edit_price.grid(row=5, column=1, padx=5, pady=5)
-        self.edit_price.insert(0, price)
+        ttk.Label(self.edit_window, text='Classroom: ').grid(row=5, column=0, padx=5, pady=5, sticky='w')
+        new_classroom = ttk.Combobox(self.edit_window, values=["1As", "2As", "3As", "4As", "5C", "5D", "6C", "6D", "7C", "7D", "5O", "5A", "6O", "6A", "7O", "7A"], width=27)
+        new_classroom.grid(row=5, column=1, padx=5, pady=5)
+        new_classroom.set(classroom)
 
-        ttk.Label(self.edit_wind, text='Number of Agent: ').grid(row=6, column=0, padx=5, pady=5, sticky='w')
-        self.edit_number_of_agent = ttk.Entry(self.edit_wind, width=30)
-        self.edit_number_of_agent.grid(row=6, column=1, padx=5, pady=5)
-        self.edit_number_of_agent.insert(0, number_of_agent)
+        ttk.Label(self.edit_window, text='Price: ').grid(row=6, column=0, padx=5, pady=5, sticky='w')
+        new_price = ttk.Entry(self.edit_window, width=30)
+        new_price.grid(row=6, column=1, padx=5, pady=5)
+        new_price.insert(0, price)
 
-        # Save button
-        ttk.Button(self.edit_wind, text='Save Changes', command=lambda: self.save_changes(student_id)).grid(row=7, columnspan=2, pady=10)
+        ttk.Label(self.edit_window, text='Number of Agent: ').grid(row=7, column=0, padx=5, pady=5, sticky='w')
+        new_number_of_agent = ttk.Entry(self.edit_window, width=30)
+        new_number_of_agent.grid(row=7, column=1, padx=5, pady=5)
+        new_number_of_agent.insert(0, number_of_agent)
 
-    def save_changes(self, student_id):
-        query = '''
-        UPDATE students SET name = ?, code_rim = ?, gender = ?, date_of_register = ?, classroom = ?, price = ?, number_of_agent = ?
-        WHERE id = ?
-        '''
-        parameters = (
-            self.edit_name.get(),
-            self.edit_code_rim.get(),
-            self.edit_gender.get(),
-            self.edit_date_of_register.get(),
-            self.edit_classroom.get(),
-            self.edit_price.get(),
-            self.edit_number_of_agent.get(),
-            student_id
-        )
+        Button(self.edit_window, text='Update', command=lambda: self.update_student(new_name.get(), new_code_rim.get(), new_gender.get(), new_date_of_register.get(), new_classroom.get(), new_price.get(), new_number_of_agent.get(), student_id)).grid(row=8, columnspan=2, pady=10, sticky='we')
+
+    def update_student(self, name, code_rim, gender, date_of_register, classroom, price, number_of_agent, student_id):
+        query = 'UPDATE students SET name = ?, code_rim = ?, gender = ?, date_of_register = ?, classroom = ?, price = ?, number_of_agent = ? WHERE id = ?'
+        parameters = (name, code_rim, gender, date_of_register, classroom, price, number_of_agent, student_id)
         self.run_query(query, parameters)
-        self.edit_wind.destroy()
-        self.message['text'] = f'Record {student_id} updated successfully'
+        self.edit_window.destroy()
+        self.message['text'] = f'Student {student_id} updated successfully'
         self.get_students()
 
     def view_student(self):
         self.message['text'] = ''
         try:
-            student_id = self.tree.item(self.tree.selection())['values'][0]
+            selected_item = self.tree.item(self.tree.selection())
+            student_id = selected_item['values'][0]
+            name = selected_item['values'][1]
+            code_rim = selected_item['values'][2]
+            gender = selected_item['values'][3]
+            date_of_register = selected_item['values'][4]
+            classroom = selected_item['values'][5]
+            price = selected_item['values'][6]
+            number_of_agent = selected_item['values'][7]
         except IndexError:
             self.message['text'] = 'Please, select a record'
             return
 
-        # Create a new window to display the student details
-        self.view_wind = Toplevel()
-        self.view_wind.title(f'View Student {student_id}')
+        self.view_window = Toplevel()
+        self.view_window.title('View Student')
 
-        # Query to fetch the student details
-        query = 'SELECT * FROM students WHERE id = ?'
-        student = self.run_query(query, (student_id,)).fetchone()
-
-        if student:
-            ttk.Label(self.view_wind, text=f'Name: {student[1]}').pack(padx=5, pady=5)
-            ttk.Label(self.view_wind, text=f'Code Rim: {student[2]}').pack(padx=5, pady=5)
-            ttk.Label(self.view_wind, text=f'Gender: {student[3]}').pack(padx=5, pady=5)
-            ttk.Label(self.view_wind, text=f'Date of Register: {student[4]}').pack(padx=5, pady=5)
-            ttk.Label(self.view_wind, text=f'Classroom: {student[5]}').pack(padx=5, pady=5)
-            ttk.Label(self.view_wind, text=f'Price: {student[6]}').pack(padx=5, pady=5)
-            ttk.Label(self.view_wind, text=f'Number of Agent: {student[7]}').pack(padx=5, pady=5)
-        else:
-            ttk.Label(self.view_wind, text='Student not found').pack(padx=5, pady=5)
+        ttk.Label(self.view_window, text=f'Name: {name}').pack(pady=5)
+        ttk.Label(self.view_window, text=f'Code Rim: {code_rim}').pack(pady=5)
+        ttk.Label(self.view_window, text=f'Gender: {gender}').pack(pady=5)
+        ttk.Label(self.view_window, text=f'Date of Register: {date_of_register}').pack(pady=5)
+        ttk.Label(self.view_window, text=f'Classroom: {classroom}').pack(pady=5)
+        ttk.Label(self.view_window, text=f'Price: {price}').pack(pady=5)
+        ttk.Label(self.view_window, text=f'Number of Agent: {number_of_agent}').pack(pady=5)
 
     def validate(self):
-        return all([
-            self.name.get(),
-            self.code_rim.get(),
-            self.gender.get(),
-            self.date_of_register.get(),
-            self.classroom.get(),
-            self.price.get(),
-            self.number_of_agent.get()
-        ])
+        return len(self.name.get()) != 0 and len(self.code_rim.get()) != 0 and len(self.gender.get()) != 0 and len(self.date_of_register.get()) != 0 and len(self.classroom.get()) != 0 and len(self.price.get()) != 0 and len(self.number_of_agent.get()) != 0
 
     def clear_fields(self):
         self.name.delete(0, END)
         self.code_rim.delete(0, END)
         self.gender.set('')
-        self.date_of_register.delete(0, END)
+        self.date_of_register.set_date('')
         self.classroom.set('')
         self.price.delete(0, END)
         self.number_of_agent.delete(0, END)
 
 if __name__ == '__main__':
-    window = Tk()
-    window.title('School Management System')
-    app = StudentManagement(window)
-    window.mainloop()
+    root = Tk()
+    application = StudentManagement(root)
+    root.mainloop()
