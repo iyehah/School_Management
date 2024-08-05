@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import dashboard
 import student_management
-import subject_management
+import results_management  # Updated import
 import teacher_management
 import classroom_management
 import settings  # Import the settings module
@@ -39,7 +39,7 @@ class SchoolManagementSystem:
         self.student_management_frame = ttk.Frame(self.notebook)
         self.teacher_management_frame = ttk.Frame(self.notebook)
         self.classroom_management_frame = ttk.Frame(self.notebook)
-        self.subject_management_frame = ttk.Frame(self.notebook)
+        self.results_management_frame = ttk.Frame(self.notebook)  # Updated frame name
         self.settings_frame = ttk.Frame(self.notebook)
 
         # Add frames as tabs to the notebook
@@ -47,8 +47,7 @@ class SchoolManagementSystem:
         self.notebook.add(self.student_management_frame, text="Student Management")
         self.notebook.add(self.teacher_management_frame, text="Teacher Management")
         self.notebook.add(self.classroom_management_frame, text="Classroom Management")
-        self.notebook.add(self.student_management_frame, text="Student Management")
-        self.notebook.add(self.subject_management_frame, text="Subject Management")
+        self.notebook.add(self.results_management_frame, text="Results Management")  # Updated tab label
         self.notebook.add(self.settings_frame, text="Settings")
 
         # Initialize the UI for each tab
@@ -56,7 +55,7 @@ class SchoolManagementSystem:
         student_management.StudentManagement(self.student_management_frame)
         teacher_management.TeacherManagement(self.teacher_management_frame)
         classroom_management.ClassroomManagement(self.classroom_management_frame)
-        subject_management.SubjectManagement(self.subject_management_frame)
+        results_management.ResultsManagement(self.results_management_frame)  # Updated class name
         settings.Settings(self.settings_frame)  # Initialize the Settings UI
 
         # Bind the close event to the exit function

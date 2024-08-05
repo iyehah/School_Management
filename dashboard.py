@@ -113,64 +113,73 @@ class Dashboard:
         # Retrieve student data
         data = self.get_student_data()
 
-        # Prepare data for plotting
-        dates, counts = zip(*data.items())
+        if data:
+            # Prepare data for plotting
+            dates, counts = zip(*data.items())
 
-        # Create figure and axis
-        fig, ax = plt.subplots(figsize=(5, 4))
-        bars = ax.bar(dates, counts, color='skyblue', width=0.4)  # Adjust width here
+            # Create figure and axis
+            fig, ax = plt.subplots(figsize=(5, 4))
+            bars = ax.bar(dates, counts, color='skyblue', width=0.4)  # Adjust width here
 
-        # Add border to the bottom of the graph
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-        ax.spines['bottom'].set_visible(True)
-        ax.spines['bottom'].set_linewidth(2)  # Set the width of the bottom border
-        ax.spines['bottom'].set_color('black')  # Set the color of the bottom border
-        ax.spines['bottom'].set_position(('outward', 10))  # Move the border outward
+            # Add border to the bottom of the graph
+            for spine in ax.spines.values():
+                spine.set_visible(False)
+            ax.spines['bottom'].set_visible(True)
+            ax.spines['bottom'].set_linewidth(2)  # Set the width of the bottom border
+            ax.spines['bottom'].set_color('black')  # Set the color of the bottom border
+            ax.spines['bottom'].set_position(('outward', 10))  # Move the border outward
 
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Number of Students')
-        ax.set_title('Students Registered by Date')
-        ax.tick_params(axis='x', rotation=45 )
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Number of Students')
+            ax.set_title('Students Registered by Date')
+            ax.tick_params(axis='x', rotation=45)
 
-        # Embed the plot in the Tkinter window
-        canvas = FigureCanvasTkAgg(fig, master=parent_frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
+            # Embed the plot in the Tkinter window
+            canvas = FigureCanvasTkAgg(fig, master=parent_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
+        else:
+            ttk.Label(parent_frame, text="No student data available", font=('Arial', 14)).pack()
 
     def create_payment_graph(self, parent_frame):
         # Retrieve payment data
         data = self.get_payment_data()
 
-        # Prepare data for plotting
-        labels, values = zip(*data.items())
+        if data:
+            # Prepare data for plotting
+            labels, values = zip(*data.items())
 
-        # Create figure and axis
-        fig, ax = plt.subplots(figsize=(3, 2))
-        ax.pie(values, labels=labels, autopct='%1.1f%%', colors=plt.cm.Paired(range(len(labels))))
-        ax.set_title('Payment Status')
+            # Create figure and axis
+            fig, ax = plt.subplots(figsize=(3, 2))
+            ax.pie(values, labels=labels, autopct='%1.1f%%', colors=plt.cm.Paired(range(len(labels))))
+            ax.set_title('Payment Status')
 
-        # Embed the plot in the Tkinter window
-        canvas = FigureCanvasTkAgg(fig, master=parent_frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
+            # Embed the plot in the Tkinter window
+            canvas = FigureCanvasTkAgg(fig, master=parent_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
+        else:
+            ttk.Label(parent_frame, text="", font=('Arial', 14)).pack()
 
     def create_classroom_graph(self, parent_frame):
         # Retrieve classroom data
         data = self.get_classroom_data()
 
-        # Prepare data for plotting
-        classrooms, percentages = zip(*data.items())
+        if data:
+            # Prepare data for plotting
+            classrooms, percentages = zip(*data.items())
 
-        # Create figure and axis
-        fig, ax = plt.subplots(figsize=(4, 3))
-        ax.pie(percentages, labels=classrooms, autopct='%1.1f%%', colors=plt.cm.Paired(range(len(classrooms))))
-        ax.set_title('Percentage of Students in Each Classroom')
+            # Create figure and axis
+            fig, ax = plt.subplots(figsize=(4, 3))
+            ax.pie(percentages, labels=classrooms, autopct='%1.1f%%', colors=plt.cm.Paired(range(len(classrooms))))
+            ax.set_title('Percentage of Students in Each Classroom')
 
-        # Embed the plot in the Tkinter window
-        canvas = FigureCanvasTkAgg(fig, master=parent_frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
+            # Embed the plot in the Tkinter window
+            canvas = FigureCanvasTkAgg(fig, master=parent_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
+        else:
+            ttk.Label(parent_frame, text="", font=('Arial', 14)).pack()
 
     def get_total_students(self):
         conn = sqlite3.connect('database.db')
@@ -178,7 +187,7 @@ class Dashboard:
         cursor.execute("SELECT COUNT(*) FROM students")
         count = cursor.fetchone()[0]
         conn.close()
-        return count
+        return count if count else 0
 
     def get_total_teachers(self):
         conn = sqlite3.connect('database.db')
@@ -186,7 +195,7 @@ class Dashboard:
         cursor.execute("SELECT COUNT(*) FROM teachers")
         count = cursor.fetchone()[0]
         conn.close()
-        return count
+        return count if count else 0
 
     def get_total_classrooms(self):
         conn = sqlite3.connect('database.db')
@@ -194,7 +203,7 @@ class Dashboard:
         cursor.execute("SELECT COUNT(*) FROM classrooms")
         count = cursor.fetchone()[0]
         conn.close()
-        return count
+        return count if count else 0
 
     def get_unpaid_students(self):
         conn = sqlite3.connect('database.db')
@@ -202,7 +211,7 @@ class Dashboard:
         cursor.execute("SELECT COUNT(*) FROM students WHERE price <= 0")
         count = cursor.fetchone()[0]
         conn.close()
-        return count
+        return count if count else 0
 
     def get_total_price(self):
         conn = sqlite3.connect('database.db')
@@ -210,7 +219,7 @@ class Dashboard:
         cursor.execute("SELECT SUM(price) FROM students")
         total = cursor.fetchone()[0]
         conn.close()
-        return f"${total:,.2f}"
+        return f"${total:,.2f}" if total else "$0.00"
 
     def get_total_salary(self):
         conn = sqlite3.connect('database.db')
@@ -218,7 +227,7 @@ class Dashboard:
         cursor.execute("SELECT SUM(salary) FROM teachers")
         total = cursor.fetchone()[0]
         conn.close()
-        return f"${total:,.2f}"
+        return f"${total:,.2f}" if total else "$0.00"
 
     def get_student_data(self):
         conn = sqlite3.connect('database.db')
@@ -226,7 +235,7 @@ class Dashboard:
         cursor.execute("SELECT date_of_register, COUNT(*) FROM students GROUP BY date_of_register")
         data = dict(cursor.fetchall())
         conn.close()
-        return data
+        return data if data else {}
 
     def get_payment_data(self):
         conn = sqlite3.connect('database.db')
@@ -234,17 +243,21 @@ class Dashboard:
         cursor.execute("SELECT CASE WHEN price <= 0 THEN 'Unpaid' ELSE 'Paid' END AS status, COUNT(*) FROM students GROUP BY status")
         data = cursor.fetchall()
         conn.close()
-        return dict(data)
+        return dict(data) if data else {}
 
     def get_classroom_data(self):
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute("SELECT classroom, COUNT(*) FROM students GROUP BY classroom")
         data = cursor.fetchall()
-        total_students = sum(count for _, count in data)
-        classroom_data = {classroom: (count / total_students * 100) for classroom, count in data}
         conn.close()
-        return classroom_data
+
+        if data:
+            total_students = sum(count for _, count in data)
+            classroom_data = {classroom: (count / total_students * 100) for classroom, count in data}
+            return classroom_data
+        else:
+            return {}
 
     def update_student_price(self):
         code_rim = self.student_code_entry.get()

@@ -11,6 +11,7 @@ cursor = conn.cursor()
 cursor.execute("DROP TABLE IF EXISTS students;")
 cursor.execute("DROP TABLE IF EXISTS classrooms;")
 cursor.execute("DROP TABLE IF EXISTS teachers;")
+cursor.execute("DROP TABLE IF EXISTS results;")  # Drop the results table if it exists
 
 # Create new tables
 create_students_table = '''
@@ -48,10 +49,61 @@ CREATE TABLE IF NOT EXISTS teachers (
 );
 '''
 
+# Drop and recreate the results table with the new schema including coefficient columns for each subject
+create_results_table = '''
+CREATE TABLE IF NOT EXISTS results (
+    student_code_rim TEXT NOT NULL,
+    student_name TEXT NOT NULL,
+    classroom TEXT NOT NULL,
+    examen_type TEXT NOT NULL,
+    Math INTEGER,
+    c_Math INTEGER,
+    PC INTEGER,
+    c_PC INTEGER,
+    SN INTEGER,
+    c_SN INTEGER,
+    FR INTEGER,
+    c_FR INTEGER,
+    EN INTEGER,
+    c_EN INTEGER,
+    AR INTEGER,
+    c_AR INTEGER,
+    ES INTEGER,
+    c_ES INTEGER,
+    IE INTEGER,
+    c_IE INTEGER,
+    CE INTEGER,
+    c_CE INTEGER,
+    HG INTEGER,
+    c_HG INTEGER,
+    PH INTEGER,
+    c_PH INTEGER,
+    IL INTEGER,
+    c_IL INTEGER,
+    IT INTEGER,
+    c_IT INTEGER,
+    KH INTEGER,
+    c_KH INTEGER,
+    ID INTEGER,
+    c_ID INTEGER,
+    ET INTEGER,
+    c_ET INTEGER,
+    WS INTEGER,
+    c_WS INTEGER,
+    MC INTEGER,
+    c_MC INTEGER,
+    IA INTEGER,
+    c_IA INTEGER,
+    TA INTEGER,
+    c_TA INTEGER
+);
+'''
+
 # Execute the queries to create the tables
 cursor.execute(create_students_table)
 cursor.execute(create_classrooms_table)
 cursor.execute(create_teachers_table)
+cursor.execute(create_results_table)
 
 # Commit the changes and close the connection
 conn.commit()
