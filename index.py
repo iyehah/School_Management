@@ -6,12 +6,19 @@ import student_management
 import subject_management
 import teacher_management
 import classroom_management
+import settings  # Import the settings module
 
 class SchoolManagementSystem:
     def __init__(self, root):
         self.root = root
         self.root.title("School Management System")
-        self.root.geometry("900x700")
+
+        # Get the screen dimensions
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        # Set window size to the screen dimensions
+        self.root.geometry(f"{screen_width}x{screen_height}")
 
         # Configure the style for the notebook and tabs
         style = ttk.Style()
@@ -30,23 +37,27 @@ class SchoolManagementSystem:
         # Create frames for each tab
         self.dashboard_frame = ttk.Frame(self.notebook)
         self.student_management_frame = ttk.Frame(self.notebook)
-        self.subject_management_frame = ttk.Frame(self.notebook)
         self.teacher_management_frame = ttk.Frame(self.notebook)
         self.classroom_management_frame = ttk.Frame(self.notebook)
+        self.subject_management_frame = ttk.Frame(self.notebook)
+        self.settings_frame = ttk.Frame(self.notebook)
 
         # Add frames as tabs to the notebook
         self.notebook.add(self.dashboard_frame, text="Dashboard")
         self.notebook.add(self.student_management_frame, text="Student Management")
-        self.notebook.add(self.subject_management_frame, text="Subject Management")
         self.notebook.add(self.teacher_management_frame, text="Teacher Management")
         self.notebook.add(self.classroom_management_frame, text="Classroom Management")
+        self.notebook.add(self.student_management_frame, text="Student Management")
+        self.notebook.add(self.subject_management_frame, text="Subject Management")
+        self.notebook.add(self.settings_frame, text="Settings")
 
         # Initialize the UI for each tab
         dashboard.Dashboard(self.dashboard_frame)
         student_management.StudentManagement(self.student_management_frame)
-        subject_management.SubjectManagement(self.subject_management_frame)
         teacher_management.TeacherManagement(self.teacher_management_frame)
         classroom_management.ClassroomManagement(self.classroom_management_frame)
+        subject_management.SubjectManagement(self.subject_management_frame)
+        settings.Settings(self.settings_frame)  # Initialize the Settings UI
 
         # Bind the close event to the exit function
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)

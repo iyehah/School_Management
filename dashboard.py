@@ -21,12 +21,16 @@ class Dashboard:
         style = ttk.Style()
         
         # Define custom styles for each card with different background colors
-        style.configure('Card1.TFrame', background='lightblue')
-        style.configure('Card2.TFrame', background='lightgreen')
-        style.configure('Card3.TFrame', background='lightcoral')
-        style.configure('Card4.TFrame', background='lightgoldenrodyellow')
-        style.configure('Card5.TFrame', background='lightpink')
-        style.configure('Card6.TFrame', background='lightgray')
+        style.configure('Card1.TFrame', background='#36C2CE')
+        style.configure('Card2.TFrame', background='#36C2CE')
+        style.configure('Card3.TFrame', background='#36C2CE')
+        style.configure('Card4.TFrame', background='#36C2CE')
+        style.configure('Card5.TFrame', background='#36C2CE')
+        style.configure('Card6.TFrame', background='#36C2CE')
+
+        # Configure text colors for card labels
+        style.configure('CardTitle.TLabel', background='#36C2CE', foreground='white', font=('Arial', 14))
+        style.configure('CardValue.TLabel', background='#36C2CE', foreground='white', font=('Arial', 18, 'bold'))
 
     def create_content_cards(self):
         # Frame for content cards
@@ -34,21 +38,21 @@ class Dashboard:
         card_frame.pack(fill='x')
 
         # Create cards with different styles
-        self.create_card(card_frame, "Total Students", self.get_total_students(), 'Card1.TFrame')
-        self.create_card(card_frame, "Total Teachers", self.get_total_teachers(), 'Card2.TFrame')
-        self.create_card(card_frame, "Total Classrooms", self.get_total_classrooms(), 'Card3.TFrame')
-        self.create_card(card_frame, "Unpaid Students", self.get_unpaid_students(), 'Card4.TFrame')
-        self.create_card(card_frame, "Total Money", self.get_total_price(), 'Card5.TFrame')
-        self.create_card(card_frame, "Total Salary", self.get_total_salary(), 'Card6.TFrame')
+        self.create_card(card_frame, "Total Students", self.get_total_students(), 'Card1.TFrame', 'CardTitle.TLabel', 'CardValue.TLabel')
+        self.create_card(card_frame, "Total Teachers", self.get_total_teachers(), 'Card2.TFrame', 'CardTitle.TLabel', 'CardValue.TLabel')
+        self.create_card(card_frame, "Total Classrooms", self.get_total_classrooms(), 'Card3.TFrame', 'CardTitle.TLabel', 'CardValue.TLabel')
+        self.create_card(card_frame, "Unpaid Students", self.get_unpaid_students(), 'Card4.TFrame', 'CardTitle.TLabel', 'CardValue.TLabel')
+        self.create_card(card_frame, "Total Money", self.get_total_price(), 'Card5.TFrame', 'CardTitle.TLabel', 'CardValue.TLabel')
+        self.create_card(card_frame, "Total Salary", self.get_total_salary(), 'Card6.TFrame', 'CardTitle.TLabel', 'CardValue.TLabel')
 
-    def create_card(self, parent_frame, title, value, style):
+    def create_card(self, parent_frame, title, value, style, title_style, value_style):
         card = ttk.Frame(parent_frame, relief='solid', padding="10", style=style)
         card.pack(side='left', padx=10, pady=10, fill='both', expand=True)
 
-        title_label = ttk.Label(card, text=title, font=('Arial', 14))
+        title_label = ttk.Label(card, text=title, style=title_style)
         title_label.pack()
 
-        value_label = ttk.Label(card, text=value, font=('Arial', 18, 'bold'))
+        value_label = ttk.Label(card, text=value, style=value_style)
         value_label.pack()
 
     def create_graphics(self):
