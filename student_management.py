@@ -78,9 +78,12 @@ class StudentManagement:
         self.filter_date = DateEntry(self.search_frame, width=12)
         self.filter_date.pack(side='left', padx=5)
         ttk.Button(self.search_frame, text='Filter by Date', command=self.filter_by_date).pack(side='left', padx=5)
-        
+
+        classroom_titles = get_classroom_titles()
+        classroom_titles.insert(0, " ")  # Insert " " at the first option 
+
         ttk.Label(self.search_frame, text='Filter by Class: ').pack(side='left', padx=5)
-        self.filter_classroom = ttk.Combobox(self.search_frame, values=["", "1As", "2As", "3As", "4As", "5C", "5D", "6C", "6D", "7C", "7D", "5O", "5A", "6O", "6A", "7O", "7A"], width=15)
+        self.filter_classroom = ttk.Combobox(self.search_frame, values= classroom_titles, width=15)
         self.filter_classroom.pack(side='left', padx=5)
         self.filter_classroom.set("")
         ttk.Button(self.search_frame, text='Filter by Classroom', command=self.filter_by_classroom).pack(side='left', padx=5)

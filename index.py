@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 from tkinter import ttk
 import dashboard
@@ -46,6 +47,15 @@ class SchoolManagementSystem:
         subject_management.SubjectManagement(self.subject_management_frame)
         teacher_management.TeacherManagement(self.teacher_management_frame)
         classroom_management.ClassroomManagement(self.classroom_management_frame)
+
+        # Bind the close event to the exit function
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def on_close(self):
+        # Perform any cleanup tasks here
+        print("Closing application...")  # For debugging
+        self.root.destroy()
+        sys.exit()  # Ensure the application exits completely
 
 if __name__ == "__main__":
     window = tk.Tk()

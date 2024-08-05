@@ -11,6 +11,16 @@ class ClassroomManagement:
         self.init_ui()
 
     def init_ui(self):
+        style = ttk.Style()
+        style.configure("Treeview.Heading", bg="#4a4a4a",fieldbackground='red',font=('Arial', 10, 'bold'), anchor="center")
+        style.configure("Treeview", rowheight=25 , borderwidth=5,relief="solid",bg="#4a4a4a")
+        style.configure("Treeview.Cell", anchor="center")
+        style.map("Treeview.Heading",background=[('active', 'blue')],foreground=[('active', 'green')])
+        style.map('Treeview',
+              background=[('selected', '#d9d9d9')],  # Background color for the selected row
+              foreground=[('selected', 'black')])  # Text color for the selected row
+
+
         self.title_label = ttk.Label(self.master, text="Classroom Management", font=("Arial", 16))
         self.title_label.pack(pady=10)
 
@@ -79,14 +89,20 @@ class ClassroomManagement:
         self.table_frame = tk.Frame(self.view_frame)
         self.table_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.table = ttk.Treeview(self.table_frame, columns=("ID", "Title", "Level", "Type", "Subjects"), show='headings')
+        self.table = ttk.Treeview(self.table_frame, height= 10, columns=("ID", "Title", "Level", "Type", "Subjects"), show='headings',style='Treeview')
         self.table.heading("ID", text="ID")
         self.table.heading("Title", text="Title")
         self.table.heading("Level", text="Level")
         self.table.heading("Type", text="Type")
         self.table.heading("Subjects", text="Subjects")
-        self.table.column("Subjects", width=300)
-        self.table.pack(fill=tk.BOTH, expand=True)
+
+        self.table.column("ID",width=50, anchor='center')
+        self.table.column("Title",width=50, anchor='center')
+        self.table.column("Level",width=100, anchor='center')
+        self.table.column("Type",width=50, anchor='center')
+
+        self.table.column("Subjects", anchor=tk.W)
+        self.table.pack(fill="both", expand=True)
 
         self.table_scroll = ttk.Scrollbar(self.table_frame, orient="vertical", command=self.table.yview)
         self.table_scroll.pack(side='right', fill='y')

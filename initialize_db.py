@@ -10,8 +10,9 @@ cursor = conn.cursor()
 # Drop existing tables if they exist
 cursor.execute("DROP TABLE IF EXISTS students;")
 cursor.execute("DROP TABLE IF EXISTS classrooms;")
+cursor.execute("DROP TABLE IF EXISTS teachers;")
 
-# Create new tables with additional fields
+# Create new tables
 create_students_table = '''
 CREATE TABLE IF NOT EXISTS students (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,12 +36,25 @@ CREATE TABLE IF NOT EXISTS classrooms (
 );
 '''
 
+create_teachers_table = '''
+CREATE TABLE IF NOT EXISTS teachers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    gender TEXT NOT NULL,
+    date_of_register TEXT NOT NULL,
+    classroom TEXT NOT NULL,
+    salary REAL NOT NULL,
+    number_of_teachers INTEGER NOT NULL
+);
+'''
+
 # Execute the queries to create the tables
 cursor.execute(create_students_table)
 cursor.execute(create_classrooms_table)
+cursor.execute(create_teachers_table)
 
 # Commit the changes and close the connection
 conn.commit()
 conn.close()
 
-print("Database updated successfully.")
+print("Database initialized successfully.")
