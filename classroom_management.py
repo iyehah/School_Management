@@ -21,8 +21,8 @@ class ClassroomManagement:
               foreground=[('selected', 'black')])  # Text color for the selected row
 
 
-        self.title_label = ttk.Label(self.master, text="Classroom Management", font=("Arial", 16))
-        self.title_label.pack(pady=10)
+        self.title_label = ttk.Label(self.master, text="Classroom Management", font=("Arial", 16),background='white')
+        self.title_label.pack(pady=10 ,fill="x")
 
         self.main_frame = tk.Frame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=True)

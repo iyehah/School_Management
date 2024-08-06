@@ -3,6 +3,7 @@ from tkinter import ttk
 import sqlite3
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from styles import colors
 
 class Dashboard:
     def __init__(self, frame):
@@ -21,7 +22,7 @@ class Dashboard:
         style = ttk.Style()
         
         # Define custom styles for each card with different background colors
-        style.configure('Card1.TFrame', background='#36C2CE')
+        style.configure('Card1.TFrame', background=colors('blue'))
         style.configure('Card2.TFrame', background='#36C2CE')
         style.configure('Card3.TFrame', background='#36C2CE')
         style.configure('Card4.TFrame', background='#36C2CE')
@@ -46,7 +47,7 @@ class Dashboard:
         self.create_card(card_frame, "Total Salary", self.get_total_salary(), 'Card6.TFrame', 'CardTitle.TLabel', 'CardValue.TLabel')
 
     def create_card(self, parent_frame, title, value, style, title_style, value_style):
-        card = ttk.Frame(parent_frame, relief='solid', padding="10", style=style)
+        card = ttk.Frame(parent_frame, padding="10", style=style)
         card.pack(side='left', padx=10, pady=10, fill='both', expand=True)
 
         title_label = ttk.Label(card, text=title, style=title_style)
@@ -61,7 +62,7 @@ class Dashboard:
         graph_frame.pack(fill='both', expand=True)
 
         # Create a frame for controls on the left side
-        control_frame = ttk.LabelFrame(graph_frame, text="Controls", padding="10")
+        control_frame = ttk.Frame(graph_frame, padding="10")
         control_frame.pack(side='left', fill='y', padx=10)
 
         # Create a frame for graphics on the center side
@@ -118,8 +119,8 @@ class Dashboard:
             dates, counts = zip(*data.items())
 
             # Create figure and axis
-            fig, ax = plt.subplots(figsize=(5, 4))
-            bars = ax.bar(dates, counts, color='skyblue', width=0.4)  # Adjust width here
+            fig, ax = plt.subplots(figsize=(4, 4))
+            bars = ax.bar(dates, counts, color='#784756', width=0.4)  # Adjust width here
 
             # Add border to the bottom of the graph
             for spine in ax.spines.values():
@@ -127,12 +128,17 @@ class Dashboard:
             ax.spines['bottom'].set_visible(True)
             ax.spines['bottom'].set_linewidth(2)  # Set the width of the bottom border
             ax.spines['bottom'].set_color('black')  # Set the color of the bottom border
-            ax.spines['bottom'].set_position(('outward', 10))  # Move the border outward
+            ax.spines['bottom'].set_position(('outward', 0))  # Move the border outward
+            ax.spines['left'].set_visible(True)
+            ax.spines['left'].set_linewidth(2)  # Set the width of the Left border
+            ax.spines['left'].set_color('black')  # Set the color of the Left border
+            ax.spines['left'].set_position(('outward', 0))  # Move the border outward
 
-            ax.set_xlabel('Date')
+
+            # ax.set_xlabel('Date')
             ax.set_ylabel('Number of Students')
             ax.set_title('Students Registered by Date')
-            ax.tick_params(axis='x', rotation=45)
+            ax.tick_params(axis='x', rotation=0,)
 
             # Embed the plot in the Tkinter window
             canvas = FigureCanvasTkAgg(fig, master=parent_frame)
@@ -170,7 +176,7 @@ class Dashboard:
             classrooms, percentages = zip(*data.items())
 
             # Create figure and axis
-            fig, ax = plt.subplots(figsize=(4, 3))
+            fig, ax = plt.subplots(figsize=(4,3))
             ax.pie(percentages, labels=classrooms, autopct='%1.1f%%', colors=plt.cm.Paired(range(len(classrooms))))
             ax.set_title('Percentage of Students in Each Classroom')
 
@@ -178,9 +184,7 @@ class Dashboard:
             canvas = FigureCanvasTkAgg(fig, master=parent_frame)
             canvas.draw()
             canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
-        else:
-            ttk.Label(parent_frame, text="", font=('Arial', 14)).pack()
-
+        
     def get_total_students(self):
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
